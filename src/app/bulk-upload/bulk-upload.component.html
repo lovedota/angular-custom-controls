@@ -1,0 +1,8 @@
+<div 
+    (drop)="onDrop($event)"
+    (dragleave)="onDragLeave($event)"
+    (dragover)="onDragOver($event)"
+    [ngClass]="{'upload-drop-zone': true, 'dragging': isDragging}"
+>
+    Just drag and drop files here
+</div>
