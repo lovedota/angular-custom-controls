@@ -1,0 +1,6 @@
+<li>
+    {{ item.name }}
+    <ul *ngIf="item.children && item.children.length">
+        <ng2-tree-view-item *ngFor="let child of item.children" [item]="child"></ng2-tree-view-item>
+    </ul>
+</li>

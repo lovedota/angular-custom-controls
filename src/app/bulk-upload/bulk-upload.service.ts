@@ -1,23 +1,13 @@
 import { Injectable } from '@angular/core';
 
-interface Document {
-    name: string,
-    path?: string,
-};
-
-interface Folder {
-    name: string,
-    path?: string,
-    isFolder: true,
-    children: Array<Folder | Document>
-};
-
+import { File, Directory, DocumentList } from './bulk-upload.interfaces';
 
 @Injectable()
 export class BulkUploadService {
-    rootItem: Folder =  { name: 'Document Root', isFolder: true, children: [] };
+    rootItem: Directory =  { name: 'Document Root', isFolder: true, children: [] };
+    documentList: DocumentList = [];
 
-    getDataTransferList(items: DataTransferItemList) {
+    processtDataTransferList(items: DataTransferItemList) {
         const length = items.length;
 
         for (let i = 0; i < length; i++) {
@@ -25,19 +15,29 @@ export class BulkUploadService {
 
             entries[0] = items[i].webkitGetAsEntry();
 
-            this.readDirectory(entries, this.rootItem);
+            this.readDirectory(entries);
         }
     }
 
-    readDirectory(entries: WebKitDirectoryEntry[], parentNode: Folder) {
+    readDirectory(entries: Array<WebKitDirectoryEntry | WebKitFileEntry>, parentNode?: Directory) {
         for (let i = 0; i < entries.length; i++) {
             const entry = entries[i];
 
             if (entry.isDirectory) {
-                let folder = { name: entry.name, isFolder: true, path: entry.fullPath, children: [] };
-                parentNode.children.push(folder);
+                const folder = {
+                    name: entry.name,
+                    isFolder: true,
+                    path: entry.fullPath,
+                    children: []
+                };
 
-                const directoryReader = entry.createReader();
+                if (parentNode) {
+                    parentNode.children.push(folder);
+                } else {
+                    this.documentList.push(folder);
+                }
+
+                const directoryReader = (<WebKitDirectoryEntry>entry).createReader();
 
                 this.getAllEntries(
                     directoryReader,
@@ -46,10 +46,13 @@ export class BulkUploadService {
                 );
 
             } else {
-               parentNode.children.push(
-                    { name: entry.name, path: entry.fullPath }
-                );
-                // entries[i].file(appendFile, errorHandler);
+                const document = { name: entry.name, path: entry.fullPath };
+
+                if (parentNode) {
+                    parentNode.children.push(document);
+                } else {
+                    this.documentList.push(document);
+                }
             }
         }
     }

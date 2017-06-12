@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-
 import { BulkUploadService } from './bulk-upload.service';
+import { DocumentList, Directory } from './bulk-upload.interfaces';
 
 @Component({
     selector: 'ng2-bulk-upload',
@@ -10,19 +10,18 @@ import { BulkUploadService } from './bulk-upload.service';
 })
 export class BulkUploadComponent {
     isDragging = false;
+    items: DocumentList;
 
-    constructor(private _bulkUploadService: BulkUploadService) {
-
-    }
+    constructor(private _bulkUploadService: BulkUploadService) {}
 
     onDrop(event: DragEvent) {
         event.preventDefault();
 
         this.isDragging = false;
 
-        this._bulkUploadService.getDataTransferList(event.dataTransfer.items);
+        this._bulkUploadService.processtDataTransferList(event.dataTransfer.items);
 
-        console.log(this._bulkUploadService.rootItem);
+        console.log((<Directory>(this._bulkUploadService.documentList[0])).children.length);
     }
 
     onDragOver(event: DragEvent) {
