@@ -1,22 +1,28 @@
 import { Component } from '@angular/core';
 
+import { BulkUploadService } from './bulk-upload.service';
+
 @Component({
     selector: 'ng2-bulk-upload',
     templateUrl: 'bulk-upload.component.html',
-    styleUrls: ['./bulk-upload.component.scss']
+    styleUrls: ['./bulk-upload.component.scss'],
+    providers: [BulkUploadService]
 })
 export class BulkUploadComponent {
-    isDragging: boolean;
+    isDragging = false;
 
-    constructor() {
-        this.isDragging = false;
+    constructor(private _bulkUploadService: BulkUploadService) {
+
     }
 
     onDrop(event: DragEvent) {
         event.preventDefault();
 
         this.isDragging = false;
-        console.log(event.dataTransfer.files);
+
+        this._bulkUploadService.getDataTransferList(event.dataTransfer.items);
+
+        console.log(this._bulkUploadService.rootItem);
     }
 
     onDragOver(event: DragEvent) {
